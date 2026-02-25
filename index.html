@@ -1,27 +1,1442 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>دوكان - تسوق عبر الإنترنت</title>
+    <title>دكان — محاكاة نموذج المنتج</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --bg: #f4f3f0;
+            --surface: #ffffff;
+            --surface-alt: #faf9f7;
+            --border: #e5e2dd;
+            --border-focus: #1a1a1a;
+            --text: #1a1a1a;
+            --text-sec: #6b6560;
+            --text-muted: #9e9893;
+            --accent: #1a1a1a;
+            --accent-soft: #f0efed;
+            --std-c: #2563eb;
+            --std-bg: #eff6ff;
+            --std-b: #bfdbfe;
+            --unq-c: #9333ea;
+            --unq-bg: #faf5ff;
+            --unq-b: #d8b4fe;
+            --wgt-c: #16a34a;
+            --wgt-bg: #f0fdf4;
+            --wgt-b: #86efac;
+            --svc-c: #ea580c;
+            --svc-bg: #fff7ed;
+            --svc-b: #fed7aa;
+            --danger: #dc2626;
+            --danger-bg: #fef2f2;
+            --r: 10px;
+            --rs: 6px;
+            --sh: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+            --tr: 150ms ease;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ── Shell ── */
+        .shell {
+            max-width: 480px;
+            margin: 0 auto;
+            min-height: 100vh;
+            background: var(--surface);
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.06);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .header {
+            padding: 14px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            position: sticky;
+            top: 0;
+            background: var(--surface);
+            z-index: 10;
+        }
+
+        .header h1 {
+            font-size: 16px;
+            font-weight: 700;
+            flex: 1;
+        }
+
+        .body {
+            flex: 1;
+            padding: 18px 20px 100px;
+            overflow-y: auto;
+        }
+
+        .footer {
+            position: sticky;
+            bottom: 0;
+            padding: 14px 20px;
+            background: var(--surface);
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 10px;
+        }
+
+        /* ── Badge ── */
+        .badge {
+            font-size: 10px;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 20px;
+            letter-spacing: 0.3px;
+        }
+
+        .badge.standard {
+            background: var(--std-bg);
+            color: var(--std-c);
+            border: 1px solid var(--std-b);
+        }
+
+        .badge.unique {
+            background: var(--unq-bg);
+            color: var(--unq-c);
+            border: 1px solid var(--unq-b);
+        }
+
+        .badge.weighted {
+            background: var(--wgt-bg);
+            color: var(--wgt-c);
+            border: 1px solid var(--wgt-b);
+        }
+
+        .badge.service {
+            background: var(--svc-bg);
+            color: var(--svc-c);
+            border: 1px solid var(--svc-b);
+        }
+
+        /* ── Demo Switcher ── */
+        .demo-bar {
+            background: #111;
+            padding: 10px 16px 12px;
+        }
+
+        .demo-title {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.3);
+            text-align: center;
+            font-weight: 600;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .demo-types {
+            display: flex;
+            gap: 5px;
+            justify-content: center;
+            margin-bottom: 8px;
+        }
+
+        .demo-type-btn {
+            padding: 5px 12px;
+            font-size: 11px;
+            font-weight: 700;
+            font-family: inherit;
+            border: 1.5px solid rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            background: transparent;
+            color: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            transition: all var(--tr);
+        }
+
+        .demo-type-btn:hover {
+            border-color: rgba(255, 255, 255, 0.4);
+            color: white;
+        }
+
+        .demo-type-btn.active {
+            background: white;
+            color: #111;
+            border-color: white;
+        }
+
+        .demo-products {
+            display: flex;
+            gap: 5px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .demo-prod-btn {
+            padding: 4px 10px;
+            font-size: 10px;
+            font-weight: 600;
+            font-family: inherit;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.45);
+            cursor: pointer;
+            transition: all var(--tr);
+        }
+
+        .demo-prod-btn:hover {
+            color: white;
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .demo-prod-btn.active {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* ── Stepper ── */
+        .stepper {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 22px;
+        }
+
+        .step-ind {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+        }
+
+        .step-bar {
+            width: 100%;
+            height: 3px;
+            background: var(--border);
+            border-radius: 3px;
+            transition: background var(--tr);
+        }
+
+        .step-ind.active .step-bar,
+        .step-ind.done .step-bar {
+            background: var(--accent);
+        }
+
+        .step-lbl {
+            font-size: 9px;
+            font-weight: 600;
+            color: var(--text-muted);
+            letter-spacing: 0.3px;
+        }
+
+        .step-ind.active .step-lbl {
+            color: var(--text);
+            font-weight: 700;
+        }
+
+        .step-ind.done .step-lbl {
+            color: var(--text-sec);
+        }
+
+        /* ── Form ── */
+        .section {
+            margin-bottom: 22px;
+        }
+
+        .section-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-sec);
+            margin-bottom: 12px;
+            letter-spacing: 0.3px;
+        }
+
+        .group {
+            margin-bottom: 16px;
+        }
+
+        .label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 5px;
+        }
+
+        .label .req {
+            color: var(--danger);
+            margin-right: 2px;
+        }
+
+        .label .hint {
+            font-weight: 400;
+            color: var(--text-muted);
+            font-size: 11px;
+        }
+
+        .input,
+        .select,
+        .textarea {
+            width: 100%;
+            padding: 9px 12px;
+            font-size: 13px;
+            font-family: inherit;
+            border: 1.5px solid var(--border);
+            border-radius: var(--rs);
+            background: var(--surface);
+            color: var(--text);
+            transition: border-color var(--tr);
+            outline: none;
+        }
+
+        .input:focus,
+        .select:focus,
+        .textarea:focus {
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 3px rgba(26, 26, 26, 0.05);
+        }
+
+        .input::placeholder,
+        .textarea::placeholder {
+            color: var(--text-muted);
+        }
+
+        .textarea {
+            min-height: 90px;
+            resize: vertical;
+        }
+
+        .input.off {
+            background: var(--surface-alt);
+            color: var(--text-muted);
+            cursor: not-allowed;
+        }
+
+        .input-unit-wrap {
+            display: flex;
+            align-items: stretch;
+        }
+
+        .input-unit-wrap .input {
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+            border-left: none;
+            flex: 1;
+        }
+
+        .unit-tag {
+            padding: 9px 12px;
+            background: var(--surface-alt);
+            border: 1.5px solid var(--border);
+            border-top-right-radius: var(--rs);
+            border-bottom-right-radius: var(--rs);
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-sec);
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+        }
+
+        /* ── Toggle ── */
+        .toggle-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 12px;
+            background: var(--surface-alt);
+            border-radius: var(--rs);
+            border: 1.5px solid var(--border);
+        }
+
+        .toggle-label {
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .toggle {
+            width: 42px;
+            height: 22px;
+            background: var(--border);
+            border-radius: 11px;
+            position: relative;
+            cursor: pointer;
+            transition: background var(--tr);
+            flex-shrink: 0;
+        }
+
+        .toggle.on {
+            background: var(--accent);
+        }
+
+        .toggle::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            width: 18px;
+            height: 18px;
+            background: white;
+            border-radius: 50%;
+            transition: transform var(--tr);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .toggle.on::after {
+            transform: translateX(-20px);
+        }
+
+        /* ── Image Upload ── */
+        .img-upload {
+            border: 2px dashed var(--border);
+            border-radius: var(--r);
+            padding: 28px 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all var(--tr);
+        }
+
+        .img-upload:hover {
+            border-color: var(--text-muted);
+            background: var(--surface-alt);
+        }
+
+        .img-icon {
+            font-size: 28px;
+            margin-bottom: 4px;
+        }
+
+        .img-text {
+            font-size: 12px;
+            color: var(--text-sec);
+        }
+
+        .img-grid {
+            display: flex;
+            gap: 6px;
+            margin-top: 8px;
+            flex-wrap: wrap;
+        }
+
+        .img-thumb {
+            width: 56px;
+            height: 56px;
+            background: var(--surface-alt);
+            border-radius: var(--rs);
+            border: 1.5px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            position: relative;
+        }
+
+        .img-thumb.pri::after {
+            content: '★';
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            background: var(--accent);
+            color: white;
+            font-size: 8px;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* ── Breadcrumb ── */
+        .crumbs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            align-items: center;
+            margin-bottom: 10px;
+            min-height: 22px;
+        }
+
+        .crumb {
+            font-size: 11px;
+            color: var(--text-muted);
+            cursor: pointer;
+        }
+
+        .crumb:hover {
+            color: var(--text);
+        }
+
+        .crumb.cur {
+            color: var(--text);
+            font-weight: 700;
+        }
+
+        .crumb-sep {
+            font-size: 9px;
+            color: var(--text-muted);
+        }
+
+        /* ── Variants ── */
+        .var-box {
+            background: var(--surface-alt);
+            border-radius: var(--r);
+            padding: 14px;
+            border: 1.5px solid var(--border);
+        }
+
+        .var-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr auto;
+            gap: 6px;
+            align-items: end;
+            margin-bottom: 8px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .var-row:last-of-type {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .var-row .group {
+            margin-bottom: 0;
+        }
+
+        .var-row .label {
+            font-size: 10px;
+            margin-bottom: 3px;
+        }
+
+        .var-row .input,
+        .var-row .select {
+            padding: 7px 9px;
+            font-size: 12px;
+        }
+
+        .var-rm {
+            width: 30px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--danger-bg);
+            border: none;
+            border-radius: var(--rs);
+            color: var(--danger);
+            cursor: pointer;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        .var-add {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            width: 100%;
+            padding: 9px;
+            margin-top: 8px;
+            background: none;
+            border: 1.5px dashed var(--border);
+            border-radius: var(--rs);
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-sec);
+            cursor: pointer;
+            font-family: inherit;
+            transition: all var(--tr);
+        }
+
+        .var-add:hover {
+            border-color: var(--text-muted);
+            color: var(--text);
+        }
+
+        /* ── Buttons ── */
+        .btn {
+            flex: 1;
+            padding: 11px 18px;
+            font-size: 13px;
+            font-weight: 700;
+            font-family: inherit;
+            border: none;
+            border-radius: var(--rs);
+            cursor: pointer;
+            transition: all var(--tr);
+        }
+
+        .btn-pri {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-pri:hover {
+            opacity: 0.85;
+        }
+
+        .btn-sec {
+            background: var(--surface-alt);
+            color: var(--text);
+            border: 1.5px solid var(--border);
+        }
+
+        .btn-sec:hover {
+            background: var(--accent-soft);
+        }
+
+        /* ── Info Banner ── */
+        .info {
+            padding: 10px 12px;
+            border-radius: var(--rs);
+            font-size: 12px;
+            line-height: 1.6;
+            margin-bottom: 16px;
+            display: flex;
+            gap: 8px;
+            align-items: flex-start;
+        }
+
+        .info.standard {
+            background: var(--std-bg);
+            color: var(--std-c);
+            border: 1px solid var(--std-b);
+        }
+
+        .info.unique {
+            background: var(--unq-bg);
+            color: var(--unq-c);
+            border: 1px solid var(--unq-b);
+        }
+
+        .info.weighted {
+            background: var(--wgt-bg);
+            color: var(--wgt-c);
+            border: 1px solid var(--wgt-b);
+        }
+
+        .info.service {
+            background: var(--svc-bg);
+            color: var(--svc-c);
+            border: 1px solid var(--svc-b);
+        }
+
+        .info-i {
+            font-size: 15px;
+            flex-shrink: 0;
+        }
+
+        /* ── Hidden Note ── */
+        .note {
+            font-size: 11px;
+            color: var(--text-muted);
+            padding: 8px 10px;
+            background: var(--surface-alt);
+            border-radius: var(--rs);
+            margin-top: 10px;
+            line-height: 1.5;
+        }
+
+        /* ── Review ── */
+        .rev-card {
+            background: var(--surface-alt);
+            border-radius: var(--r);
+            padding: 14px;
+            margin-bottom: 10px;
+            border: 1px solid var(--border);
+        }
+
+        .rev-head {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .rev-edit {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--std-c);
+            cursor: pointer;
+        }
+
+        .rev-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 4px 0;
+            font-size: 12px;
+        }
+
+        .rev-row .rl {
+            color: var(--text-sec);
+            flex-shrink: 0;
+        }
+
+        .rev-row .rv {
+            font-weight: 600;
+            text-align: left;
+            word-break: break-word;
+        }
+
+        .rev-tbl {
+            width: 100%;
+            font-size: 12px;
+            border-collapse: collapse;
+            margin-top: 6px;
+        }
+
+        .rev-tbl th {
+            text-align: right;
+            font-weight: 600;
+            color: var(--text-sec);
+            padding: 3px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 11px;
+        }
+
+        .rev-tbl td {
+            padding: 4px 0;
+            font-weight: 600;
+        }
+
+        /* ── Edge Case Banner ── */
+        .edge-banner {
+            padding: 8px 10px;
+            border-radius: var(--rs);
+            font-size: 11px;
+            margin-bottom: 14px;
+            background: #fefce8;
+            color: #a16207;
+            border: 1px solid #fde68a;
+            display: flex;
+            gap: 6px;
+            align-items: flex-start;
+            line-height: 1.5;
+        }
+
+        /* Fade */
+        .fade {
+            animation: fadeIn 180ms ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(4px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .shell {
+                box-shadow: none;
+            }
+
+            .var-row {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .var-row> :nth-child(3) {
+                grid-column: 1 / -1;
+            }
+        }
+    </style>
 </head>
+
 <body>
-    <header>
-        <h1>مرحبًا بكم في دوكان</h1>
-        <p>تسوق عبر الإنترنت بسهولة وأمان</p>
-    </header>
-    <main>
-        <section>
-            <h2>منتجات مميزة</h2>
-            <p>اكتشف أفضل العروض والمنتجات المميزة لدينا</p>
-        </section>
-        <section>
-            <h2>حول دوكان</h2>
-            <p>دوكان هو مكانك الأمثل للتسوق عبر الإنترنت. نقدم مجموعة متنوعة من المنتجات لتلبية احتياجاتك.</p>
-        </section>
-    </main>
-    <footer>
-        <p>Copyright &copy; 2025 <a href="https://dukan.com">dukan.com</a>. جميع الحقوق محفوظة.</p>
-    </footer>
+
+    <div class="demo-bar">
+        <div class="demo-title">محاكاة — اختر نوع المنتج</div>
+        <div class="demo-types" id="demoTypes"></div>
+        <div class="demo-products" id="demoProducts"></div>
+    </div>
+
+    <div class="shell">
+        <div class="header">
+            <h1>إضافة منتج</h1>
+            <span id="badge" class="badge standard">قياسي</span>
+        </div>
+        <div class="body">
+            <div class="stepper" id="stepper"></div>
+            <div id="content"></div>
+        </div>
+        <div class="footer">
+            <button id="btnBack" class="btn btn-sec" onclick="prev()">رجوع</button>
+            <button id="btnNext" class="btn btn-pri" onclick="next()">التالي</button>
+        </div>
+    </div>
+
+    <script>
+        // ═══════════════════════════════════════════════════════════
+        // DATA
+        // ═══════════════════════════════════════════════════════════
+
+        const TYPES = {
+            standard: { ar: 'قياسي', icon: '📦', color: 'standard' },
+            unique: { ar: 'عقارات', icon: '📍', color: 'unique' },
+            weighted: { ar: 'بالوزن', icon: '⚖️', color: 'weighted' },
+            service: { ar: 'خدمة', icon: '🔧', color: 'service' },
+        };
+
+        const BANNERS = {
+            standard: { icon: '📦', text: 'منتج قياسي — مخزون قابل للعد، سعر ثابت، وتتبع المخزون.' },
+            unique: { icon: '📍', text: 'إعلان عقارات — قطعة واحدة فقط. لا حاجة لمخزون أو SKU. السعر قد يكون قابل للتفاوض.' },
+            weighted: { icon: '⚖️', text: 'منتج بالوزن/الحجم — السعر والمخزون يُدار لكل متغير (حسب الوزن أو الحجم).' },
+            service: { icon: '🔧', text: 'خدمة — لا يوجد مخزون أو شحن. التسعير بالساعة أو سعر ثابت.' },
+        };
+
+        const PRODUCTS = {
+            // ═══════ STANDARD ═══════
+            phone: {
+                type: 'standard',
+                name: 'سامسونج جالكسي S23 ألترا',
+                cat: ['إلكترونيات', 'هواتف محمولة', 'سامسونج'],
+                desc: 'جهاز جديد مع ضمان رسمي سنة كاملة. يشمل الشاحن الأصلي والسماعات. شاشة 6.8 بوصة، كاميرا 200 ميجابكسل.',
+                price: 1400000, compare: 1600000, stock: 5, sku: 'SAM-S23U-BLK-256',
+                images: ['📱', '📱', '📱'],
+                attrs: [
+                    { k: 'brand', l: 'العلامة التجارية', t: 'select', opts: ['Samsung', 'Apple', 'Huawei', 'Xiaomi'], v: 'Samsung', req: true },
+                    { k: 'model', l: 'الموديل', t: 'text', v: 'Galaxy S23 Ultra', req: true },
+                    { k: 'ram', l: 'الذاكرة العشوائية', t: 'select', opts: ['4GB', '6GB', '8GB', '12GB', '16GB'], v: '12GB' },
+                    { k: 'storage', l: 'سعة التخزين', t: 'select', opts: ['64GB', '128GB', '256GB', '512GB', '1TB'], v: '256GB' },
+                    { k: 'color', l: 'اللون', t: 'text', v: 'أسود' },
+                    { k: 'condition', l: 'الحالة', t: 'select', opts: ['جديد', 'مستعمل - ممتاز', 'مستعمل - جيد', 'مستعمل - مقبول'], v: 'جديد', req: true },
+                    { k: 'warranty', l: 'الضمان', t: 'select', opts: ['بدون ضمان', '6 أشهر', 'سنة', 'سنتين'], v: 'سنة' },
+                ],
+                variants: [
+                    { label: 'أسود 256GB', price: 1400000, stock: 5 },
+                    { label: 'أخضر 256GB', price: 1400000, stock: 3 },
+                    { label: 'أسود 512GB', price: 1650000, stock: 2 },
+                ],
+                variantsOptional: true,
+                fields: { price: true, compare: true, stock: true, sku: true, variants: true },
+            },
+
+            laptop: {
+                type: 'standard',
+                name: 'لابتوب لينوفو IdeaPad 3',
+                cat: ['إلكترونيات', 'حواسيب', 'لابتوبات'],
+                desc: 'لابتوب مناسب للطلاب والعمل المكتبي. معالج Intel i5 الجيل 12، شاشة 15.6 بوصة Full HD.',
+                price: 950000, compare: null, stock: 8, sku: 'LEN-IP3-I5-8',
+                images: ['💻', '💻'],
+                attrs: [
+                    { k: 'brand', l: 'العلامة التجارية', t: 'select', opts: ['Lenovo', 'HP', 'Dell', 'Asus', 'Acer'], v: 'Lenovo', req: true },
+                    { k: 'processor', l: 'المعالج', t: 'text', v: 'Intel i5-1235U', req: true },
+                    { k: 'ram', l: 'الذاكرة العشوائية', t: 'select', opts: ['4GB', '8GB', '16GB', '32GB'], v: '8GB', req: true },
+                    { k: 'storage', l: 'التخزين', t: 'select', opts: ['256GB SSD', '512GB SSD', '1TB SSD', '1TB HDD'], v: '512GB SSD' },
+                    { k: 'screen', l: 'حجم الشاشة', t: 'select', opts: ['13.3"', '14"', '15.6"', '17.3"'], v: '15.6"' },
+                    { k: 'condition', l: 'الحالة', t: 'select', opts: ['جديد', 'مستعمل - ممتاز', 'مستعمل - جيد'], v: 'جديد', req: true },
+                ],
+                variants: [],
+                variantsOptional: true,
+                fields: { price: true, compare: true, stock: true, sku: true, variants: true },
+            },
+
+            printer: {
+                type: 'standard',
+                name: 'طابعة HP LaserJet Pro',
+                cat: ['إلكترونيات', 'طابعات', 'ليزر'],
+                desc: 'طابعة ليزر أبيض وأسود للمكاتب. سرعة طباعة 30 صفحة بالدقيقة، واي فاي مدمج.',
+                price: 320000, compare: 380000, stock: 12, sku: 'HP-LJ-PRO-M404',
+                images: ['🖨️'],
+                attrs: [
+                    { k: 'brand', l: 'العلامة التجارية', t: 'select', opts: ['HP', 'Canon', 'Epson', 'Brother'], v: 'HP', req: true },
+                    { k: 'type', l: 'النوع', t: 'select', opts: ['ليزر أبيض وأسود', 'ليزر ملون', 'حبر', 'حراري'], v: 'ليزر أبيض وأسود', req: true },
+                    { k: 'connectivity', l: 'الاتصال', t: 'select', opts: ['USB فقط', 'USB + WiFi', 'USB + WiFi + Ethernet'], v: 'USB + WiFi' },
+                    { k: 'condition', l: 'الحالة', t: 'select', opts: ['جديد', 'مستعمل - ممتاز', 'مستعمل - جيد'], v: 'جديد', req: true },
+                ],
+                variants: [],
+                variantsOptional: true,
+                fields: { price: true, compare: true, stock: true, sku: true, variants: true },
+            },
+
+            // ═══════ UNIQUE ═══════
+            apartment: {
+                type: 'unique',
+                name: 'شقة 120م² في المزة - دمشق',
+                cat: ['عقارات', 'شقق', 'للبيع'],
+                desc: 'شقة مطلة على الشارع الرئيسي، طابق ثالث مع مصعد. قريبة من المدارس والمواصلات. تدفئة مركزية، ديكور حديث. صالون واسع مع بلكونة.',
+                price: 85000000, negotiable: true,
+                images: ['🏢', '🏢', '🏢', '🏢'],
+                attrs: [
+                    { k: 'area', l: 'المساحة', t: 'number', v: 120, unit: 'م²', req: true },
+                    { k: 'rooms', l: 'عدد الغرف', t: 'select', opts: ['1', '2', '3', '4', '5', '6+'], v: '3', req: true },
+                    { k: 'bathrooms', l: 'الحمامات', t: 'select', opts: ['1', '2', '3', '4+'], v: '2', req: true },
+                    { k: 'floor', l: 'الطابق', t: 'select', opts: ['أرضي', '1', '2', '3', '4', '5', '6+', 'روف'], v: '3', req: true },
+                    { k: 'furnished', l: 'التأثيث', t: 'select', opts: ['بدون أثاث', 'نصف مفروشة', 'مفروشة بالكامل'], v: 'نصف مفروشة', req: true },
+                    { k: 'heating', l: 'التدفئة', t: 'select', opts: ['مركزية', 'فردية', 'بدون'], v: 'مركزية' },
+                    { k: 'parking', l: 'موقف سيارة', t: 'select', opts: ['نعم', 'لا'], v: 'نعم' },
+                    { k: 'city', l: 'المدينة', t: 'select', opts: ['دمشق', 'حلب', 'حمص', 'اللاذقية', 'طرطوس', 'حماة'], v: 'دمشق', req: true },
+                    { k: 'neighborhood', l: 'الحي', t: 'text', v: 'المزة' },
+                ],
+                fields: { price: true, compare: false, stock: false, sku: false, variants: false },
+            },
+
+            land: {
+                type: 'unique',
+                name: 'أرض سكنية 500م² - اللاذقية',
+                cat: ['عقارات', 'أراضي'],
+                desc: 'أرض سكنية على طريق معبد، مطلة على البحر. مناسبة لبناء فيلا أو مشروع سكني صغير. جميع الخدمات متوفرة.',
+                price: 120000000, negotiable: true,
+                images: ['🏗️'],
+                attrs: [
+                    { k: 'area', l: 'المساحة', t: 'number', v: 500, unit: 'م²', req: true },
+                    { k: 'zoning', l: 'التصنيف', t: 'select', opts: ['سكني', 'تجاري', 'زراعي', 'صناعي'], v: 'سكني', req: true },
+                    { k: 'road', l: 'الوصول', t: 'select', opts: ['طريق رئيسي', 'طريق فرعي', 'طريق ترابي', 'بدون وصول'], v: 'طريق رئيسي' },
+                    { k: 'utilities', l: 'الخدمات', t: 'select', opts: ['كاملة', 'كهرباء فقط', 'ماء فقط', 'بدون'], v: 'كاملة' },
+                    { k: 'city', l: 'المدينة', t: 'select', opts: ['دمشق', 'حلب', 'حمص', 'اللاذقية', 'طرطوس', 'ريف دمشق'], v: 'اللاذقية', req: true },
+                ],
+                fields: { price: true, compare: false, stock: false, sku: false, variants: false },
+            },
+
+            car: {
+                type: 'unique',
+                name: 'كيا سبورتاج 2022',
+                cat: ['سيارات', 'سيارات دفع رباعي'],
+                desc: 'سيارة بحالة ممتازة، صيانة وكالة كاملة. فول أوبشن مع فتحة سقف، كاميرا خلفية، شاشة لمس.',
+                price: 45000000, negotiable: true,
+                images: ['🚗', '🚗', '🚗'],
+                attrs: [
+                    { k: 'make', l: 'الشركة المصنعة', t: 'select', opts: ['Kia', 'Hyundai', 'Toyota', 'Honda', 'BMW', 'Mercedes'], v: 'Kia', req: true },
+                    { k: 'model', l: 'الموديل', t: 'text', v: 'Sportage', req: true },
+                    { k: 'year', l: 'سنة الصنع', t: 'select', opts: ['2026', '2025', '2024', '2023', '2022', '2021', '2020', 'أقدم'], v: '2022', req: true },
+                    { k: 'mileage', l: 'الكيلومترات', t: 'number', v: 35000, unit: 'كم', req: true },
+                    { k: 'fuel', l: 'الوقود', t: 'select', opts: ['بنزين', 'ديزل', 'هايبرد', 'كهربائي'], v: 'بنزين', req: true },
+                    { k: 'transmission', l: 'ناقل الحركة', t: 'select', opts: ['أوتوماتيك', 'عادي'], v: 'أوتوماتيك', req: true },
+                    { k: 'color', l: 'اللون', t: 'text', v: 'أبيض' },
+                    { k: 'city', l: 'الموقع', t: 'select', opts: ['دمشق', 'حلب', 'حمص', 'اللاذقية', 'طرطوس'], v: 'دمشق', req: true },
+                ],
+                fields: { price: true, compare: false, stock: false, sku: false, variants: false },
+                edgeCaseNote: 'السيارات المستعملة فريدة — كل واحدة مختلفة. لا يوجد "مخزون" من نفس السيارة.',
+            },
+
+            // ═══════ WEIGHTED ═══════
+            rice: {
+                type: 'weighted',
+                name: 'أرز بسمتي سوري - حسكة',
+                cat: ['أغذية', 'حبوب وأرز'],
+                desc: 'أرز بسمتي فاخر من مزارع الحسكة. حبة طويلة، طبخ ممتاز. محصول 2025.',
+                images: ['🌾', '🌾'],
+                attrs: [
+                    { k: 'origin', l: 'المصدر', t: 'select', opts: ['الحسكة', 'دير الزور', 'الرقة', 'حلب', 'مستورد'], v: 'الحسكة', req: true },
+                    { k: 'grain_type', l: 'النوع', t: 'select', opts: ['بسمتي', 'مصري', 'أمريكي', 'بني', 'برغل', 'فريكة'], v: 'بسمتي', req: true },
+                    { k: 'organic', l: 'عضوي', t: 'select', opts: ['نعم', 'لا'], v: 'لا' },
+                    { k: 'harvest', l: 'سنة الحصاد', t: 'select', opts: ['2024', '2025', '2026'], v: '2025' },
+                ],
+                variants: [
+                    { label: '500 غرام', price: 5000, stock: 200, unit: 'غ' },
+                    { label: '1 كيلو', price: 9000, stock: 150, unit: 'كغ' },
+                    { label: '5 كيلو', price: 40000, stock: 50, unit: 'كغ' },
+                    { label: '25 كيلو', price: 180000, stock: 10, unit: 'كغ' },
+                ],
+                unitOptions: ['غ', 'كغ'],
+                fields: { price: false, compare: false, stock: false, sku: false, variants: true },
+            },
+
+            oil: {
+                type: 'weighted',
+                name: 'زيت زيتون بكر - عفرين',
+                cat: ['أغذية', 'زيوت'],
+                desc: 'زيت زيتون بكر ممتاز معصور على البارد من منطقة عفرين. طعم غني ولون ذهبي.',
+                images: ['🫒', '🫒'],
+                attrs: [
+                    { k: 'oil_type', l: 'نوع الزيت', t: 'select', opts: ['زيت زيتون', 'زيت عباد الشمس', 'زيت سمسم', 'زيت حبة البركة'], v: 'زيت زيتون', req: true },
+                    { k: 'press', l: 'طريقة العصر', t: 'select', opts: ['عصر بارد', 'عصر حار', 'مكرر'], v: 'عصر بارد' },
+                    { k: 'region', l: 'المنطقة', t: 'select', opts: ['عفرين', 'إدلب', 'اللاذقية', 'طرطوس', 'مستورد'], v: 'عفرين', req: true },
+                    { k: 'acidity', l: 'نسبة الحموضة', t: 'select', opts: ['أقل من 0.5%', '0.5% - 1%', '1% - 2%', 'أكثر من 2%'], v: 'أقل من 0.5%' },
+                ],
+                variants: [
+                    { label: '500 مل', price: 25000, stock: 80, unit: 'مل' },
+                    { label: '1 لتر', price: 45000, stock: 60, unit: 'ل' },
+                    { label: '5 لتر (تنكة)', price: 200000, stock: 20, unit: 'ل' },
+                    { label: '16 لتر (تنكة كبيرة)', price: 600000, stock: 5, unit: 'ل' },
+                ],
+                unitOptions: ['مل', 'ل'],
+                fields: { price: false, compare: false, stock: false, sku: false, variants: true },
+            },
+
+            vegs: {
+                type: 'weighted',
+                name: 'بندورة طازجة - غوطة دمشق',
+                cat: ['أغذية', 'خضروات'],
+                desc: 'بندورة طازجة من مزارع الغوطة. قطف اليوم. مناسبة للسلطة والطبخ.',
+                images: ['🍅', '🍅'],
+                attrs: [
+                    { k: 'origin', l: 'المصدر', t: 'select', opts: ['غوطة دمشق', 'درعا', 'حمص', 'ريف حلب'], v: 'غوطة دمشق', req: true },
+                    { k: 'organic', l: 'عضوي', t: 'select', opts: ['نعم', 'لا'], v: 'لا' },
+                    { k: 'freshness', l: 'الطزاجة', t: 'select', opts: ['قطف اليوم', '1-2 يوم', '3-5 أيام'], v: 'قطف اليوم' },
+                ],
+                variants: [
+                    { label: '1 كيلو', price: 3000, stock: 500, unit: 'كغ' },
+                    { label: '5 كيلو', price: 13000, stock: 100, unit: 'كغ' },
+                    { label: '10 كيلو (صندوق)', price: 24000, stock: 40, unit: 'كغ' },
+                ],
+                unitOptions: ['كغ'],
+                fields: { price: false, compare: false, stock: false, sku: false, variants: true },
+                edgeCaseNote: 'الخضروات قابلة للتلف — لا يوجد تاريخ انتهاء محدد لكن الطزاجة مهمة جداً.',
+            },
+
+            spices: {
+                type: 'weighted',
+                name: 'بهارات مشكلة سورية',
+                cat: ['أغذية', 'بهارات وتوابل'],
+                desc: 'خلطة بهارات سورية تقليدية مطحونة طازجة. مناسبة للكبة والمحاشي واليخنات.',
+                images: ['🫙'],
+                attrs: [
+                    { k: 'blend', l: 'نوع الخلطة', t: 'select', opts: ['بهارات مشكلة', 'سبع بهارات', 'بهار كبة', 'زعتر', 'سماق', 'كمون'], v: 'بهارات مشكلة', req: true },
+                    { k: 'grind', l: 'الطحن', t: 'select', opts: ['مطحون ناعم', 'مطحون خشن', 'حب كامل'], v: 'مطحون ناعم' },
+                    { k: 'origin', l: 'المصدر', t: 'text', v: 'حلب' },
+                ],
+                variants: [
+                    { label: '50 غرام', price: 2000, stock: 300, unit: 'غ' },
+                    { label: '100 غرام', price: 3500, stock: 200, unit: 'غ' },
+                    { label: '250 غرام', price: 8000, stock: 100, unit: 'غ' },
+                    { label: '500 غرام', price: 15000, stock: 50, unit: 'غ' },
+                    { label: '1 كيلو', price: 28000, stock: 20, unit: 'كغ' },
+                ],
+                unitOptions: ['غ', 'كغ'],
+                fields: { price: false, compare: false, stock: false, sku: false, variants: true },
+            },
+
+            // Edge case: food sold by PIECE not weight
+            eggs: {
+                type: 'weighted', // still "weighted" type but unit is pieces
+                name: 'بيض بلدي طازج',
+                cat: ['أغذية', 'بيض ومنتجات حيوانية'],
+                desc: 'بيض بلدي من دجاج حر. طازج يومياً. حجم كبير.',
+                images: ['🥚'],
+                attrs: [
+                    { k: 'type', l: 'النوع', t: 'select', opts: ['بلدي', 'مزارع', 'عضوي'], v: 'بلدي', req: true },
+                    { k: 'size', l: 'الحجم', t: 'select', opts: ['صغير', 'وسط', 'كبير', 'جامبو'], v: 'كبير' },
+                    { k: 'origin', l: 'المصدر', t: 'text', v: 'ريف دمشق' },
+                ],
+                variants: [
+                    { label: '6 بيضات (نصف طبق)', price: 4000, stock: 100, unit: 'حبة' },
+                    { label: '12 بيضة (طبق)', price: 7500, stock: 80, unit: 'حبة' },
+                    { label: '30 بيضة (كرتونة)', price: 17000, stock: 30, unit: 'حبة' },
+                ],
+                unitOptions: ['حبة'],
+                fields: { price: false, compare: false, stock: false, sku: false, variants: true },
+                edgeCaseNote: 'البيض يُباع بالحبة/الطبق وليس بالوزن — لكنه يتبع نفس نمط المتغيرات (أحجام مختلفة بأسعار مختلفة).',
+            },
+
+            // ═══════ SERVICE ═══════
+            phone_repair: {
+                type: 'service',
+                name: 'تصليح شاشة هاتف',
+                cat: ['خدمات', 'صيانة إلكترونيات'],
+                desc: 'استبدال شاشة هاتف أصلية مع ضمان 3 أشهر على القطعة. الخدمة تشمل الفحص والتنظيف الداخلي مجاناً.',
+                price: 50000,
+                images: ['🔧'],
+                attrs: [
+                    { k: 'service_type', l: 'نوع الخدمة', t: 'select', opts: ['استبدال شاشة', 'استبدال بطارية', 'إصلاح منفذ الشحن', 'إصلاح برمجي', 'تنظيف داخلي'], v: 'استبدال شاشة', req: true },
+                    { k: 'brands', l: 'الماركات المدعومة', t: 'text', v: 'Samsung, Apple, Huawei, Xiaomi', req: true },
+                    { k: 'warranty', l: 'ضمان الخدمة', t: 'select', opts: ['بدون ضمان', 'شهر', '3 أشهر', '6 أشهر'], v: '3 أشهر' },
+                    { k: 'duration', l: 'مدة الخدمة', t: 'select', opts: ['ساعة', '2-3 ساعات', 'يوم واحد', '2-3 أيام'], v: '2-3 ساعات' },
+                    { k: 'location', l: 'مكان الخدمة', t: 'select', opts: ['في المحل', 'زيارة منزلية', 'كلاهما'], v: 'كلاهما' },
+                    { k: 'city', l: 'المدينة', t: 'select', opts: ['دمشق', 'حلب', 'حمص', 'اللاذقية'], v: 'دمشق', req: true },
+                ],
+                variants: [],
+                fields: { price: true, compare: false, stock: false, sku: false, variants: false },
+                priceType: 'starting', // "يبدأ من"
+            },
+
+            cleaning: {
+                type: 'service',
+                name: 'تنظيف منازل شامل',
+                cat: ['خدمات', 'تنظيف'],
+                desc: 'خدمة تنظيف شاملة للمنازل والمكاتب. فريق مدرب مع معدات ومواد تنظيف احترافية.',
+                price: 35000,
+                images: ['🧹'],
+                attrs: [
+                    { k: 'service_type', l: 'نوع التنظيف', t: 'select', opts: ['تنظيف شامل', 'تنظيف مطابخ', 'تنظيف حمامات', 'تنظيف بعد البناء', 'تنظيف سجاد'], v: 'تنظيف شامل', req: true },
+                    { k: 'area_range', l: 'مساحة المكان', t: 'select', opts: ['أقل من 80م²', '80-120م²', '120-180م²', 'أكثر من 180م²'], v: '80-120م²', req: true },
+                    { k: 'frequency', l: 'التكرار', t: 'select', opts: ['مرة واحدة', 'أسبوعي', 'شهري'], v: 'مرة واحدة' },
+                    { k: 'duration', l: 'المدة المتوقعة', t: 'select', opts: ['2-3 ساعات', '4-5 ساعات', 'يوم كامل'], v: '4-5 ساعات' },
+                    { k: 'city', l: 'المدينة', t: 'select', opts: ['دمشق', 'حلب', 'حمص', 'اللاذقية'], v: 'دمشق', req: true },
+                ],
+                variants: [],
+                fields: { price: true, compare: false, stock: false, sku: false, variants: false },
+                priceType: 'per_session', // "للجلسة"
+                edgeCaseNote: 'الخدمات ليس لها مخزون أو شحن. بدل "أضف للسلة" يمكن عرض "احجز الآن" أو "تواصل مع مقدم الخدمة".',
+            },
+        };
+
+        // Group products by type for the demo switcher
+        const PRODUCT_GROUPS = {
+            standard: ['phone', 'laptop', 'printer'],
+            unique: ['apartment', 'land', 'car'],
+            weighted: ['rice', 'oil', 'vegs', 'spices', 'eggs'],
+            service: ['phone_repair', 'cleaning'],
+        };
+
+        // ═══════════════════════════════════════════════════════════
+        // STATE
+        // ═══════════════════════════════════════════════════════════
+        let step = 0;
+        let prod = null;
+        let prodKey = '';
+        let ltype = 'standard';
+        let vars = [];
+        let neg = false;
+
+        const STEPS = ['المعلومات الأساسية', 'الوصف', 'الخصائص', 'المراجعة'];
+
+        function fmt(n) { return new Intl.NumberFormat('en-US').format(n) + ' ل.س'; }
+
+        // ═══════════════════════════════════════════════════════════
+        // DEMO SWITCHER
+        // ═══════════════════════════════════════════════════════════
+        function buildSwitcher() {
+            const typesEl = document.getElementById('demoTypes');
+            const prodsEl = document.getElementById('demoProducts');
+
+            typesEl.innerHTML = Object.entries(TYPES).map(([k, v]) =>
+                `<button class="demo-type-btn ${k === 'standard' ? 'active' : ''}" data-type="${k}" onclick="switchType('${k}')">${v.icon} ${v.ar}</button>`
+            ).join('');
+
+            updateProductButtons('standard');
+        }
+
+        function switchType(type) {
+            document.querySelectorAll('.demo-type-btn').forEach(b => b.classList.toggle('active', b.dataset.type === type));
+            updateProductButtons(type);
+            // Load first product of this type
+            const firstKey = PRODUCT_GROUPS[type][0];
+            loadProduct(firstKey);
+        }
+
+        function updateProductButtons(type) {
+            const prodsEl = document.getElementById('demoProducts');
+            prodsEl.innerHTML = PRODUCT_GROUPS[type].map(k =>
+                `<button class="demo-prod-btn ${k === prodKey ? 'active' : ''}" data-key="${k}" onclick="loadProduct('${k}')">${PRODUCTS[k].name}</button>`
+            ).join('');
+        }
+
+        // ═══════════════════════════════════════════════════════════
+        // LOAD
+        // ═══════════════════════════════════════════════════════════
+        function loadProduct(key) {
+            prodKey = key;
+            prod = PRODUCTS[key];
+            ltype = prod.type;
+            vars = prod.variants ? prod.variants.map(v => ({ ...v })) : [];
+            neg = prod.negotiable || false;
+            step = 0;
+
+            // Update switcher highlights
+            document.querySelectorAll('.demo-type-btn').forEach(b => b.classList.toggle('active', b.dataset.type === ltype));
+            updateProductButtons(ltype);
+            document.querySelectorAll('.demo-prod-btn').forEach(b => b.classList.toggle('active', b.dataset.key === key));
+
+            // Badge
+            const badge = document.getElementById('badge');
+            badge.textContent = TYPES[ltype].ar;
+            badge.className = 'badge ' + ltype;
+
+            updateStepper();
+            render();
+            updateBtns();
+        }
+
+        // ═══════════════════════════════════════════════════════════
+        // STEPPER
+        // ═══════════════════════════════════════════════════════════
+        function updateStepper() {
+            document.getElementById('stepper').innerHTML = STEPS.map((s, i) =>
+                `<div class="step-ind ${i === step ? 'active' : ''} ${i < step ? 'done' : ''}" onclick="goTo(${i})">
+      <div class="step-bar"></div>
+      <span class="step-lbl">${s}</span>
+    </div>`
+            ).join('');
+        }
+
+        function goTo(s) { if (s <= step) { step = s; updateStepper(); render(); updateBtns(); } }
+        function next() { if (step < 3) { step++; updateStepper(); render(); updateBtns(); } }
+        function prev() { if (step > 0) { step--; updateStepper(); render(); updateBtns(); } }
+        function updateBtns() {
+            document.getElementById('btnBack').style.display = step === 0 ? 'none' : 'block';
+            document.getElementById('btnNext').textContent = step === 3 ? 'نشر المنتج' : 'التالي';
+        }
+
+        // ═══════════════════════════════════════════════════════════
+        // RENDER
+        // ═══════════════════════════════════════════════════════════
+        function render() {
+            const c = document.getElementById('content');
+            c.className = 'fade';
+            switch (step) {
+                case 0: renderS1(c); break;
+                case 1: renderS2(c); break;
+                case 2: renderS3(c); break;
+                case 3: renderS4(c); break;
+            }
+        }
+
+        // ── STEP 1 ──
+        function renderS1(c) {
+            const b = BANNERS[ltype];
+            let h = '';
+
+            // Banner
+            h += `<div class="info ${ltype}"><span class="info-i">${b.icon}</span><span>${b.text}</span></div>`;
+
+            // Edge case
+            if (prod.edgeCaseNote) {
+                h += `<div class="edge-banner">⚠️ <span>${prod.edgeCaseNote}</span></div>`;
+            }
+
+            // Breadcrumb
+            h += `<div class="section"><div class="section-title">التصنيف</div><div class="crumbs">`;
+            prod.cat.forEach((c, i) => {
+                h += `<span class="crumb ${i === prod.cat.length - 1 ? 'cur' : ''}">${c}</span>`;
+                if (i < prod.cat.length - 1) h += `<span class="crumb-sep">‹</span>`;
+            });
+            h += `</div></div>`;
+
+            // Images
+            h += `<div class="section"><div class="section-title">الصور</div>
+    <div class="img-upload"><div class="img-icon">📸</div><div class="img-text">اضغط لإضافة صور المنتج</div></div>
+    <div class="img-grid">${prod.images.map((im, i) => `<div class="img-thumb ${i === 0 ? 'pri' : ''}">${im}</div>`).join('')}</div>
+  </div>`;
+
+            // Details
+            h += `<div class="section"><div class="section-title">التفاصيل</div>`;
+
+            // Title
+            h += `<div class="group"><label class="label">العنوان <span class="req">*</span></label>
+    <input class="input" value="${prod.name}"></div>`;
+
+            // ── Price logic ──
+            if (ltype === 'weighted' && !prod.fields.price) {
+                h += `<div class="group"><label class="label">السعر <span class="hint">— يُحدد لكل متغير في الخطوة 3</span></label>
+      <input class="input off" value="يُدار حسب المتغيرات" disabled></div>`;
+            } else if (ltype === 'unique') {
+                h += `<div class="group"><label class="label">السعر (ل.س) <span class="req">*</span></label>
+      <input class="input" value="${fmt(prod.price).replace(' ل.س', '')}"></div>`;
+                h += `<div class="group"><div class="toggle-row">
+      <span class="toggle-label">السعر قابل للتفاوض</span>
+      <div class="toggle ${neg ? 'on' : ''}" onclick="neg=!neg;this.classList.toggle('on')"></div>
+    </div></div>`;
+            } else if (ltype === 'service') {
+                let priceLabel = 'السعر (ل.س)';
+                if (prod.priceType === 'starting') priceLabel = 'السعر يبدأ من (ل.س)';
+                else if (prod.priceType === 'per_session') priceLabel = 'السعر للجلسة (ل.س)';
+                else if (prod.priceType === 'per_hour') priceLabel = 'السعر بالساعة (ل.س)';
+                h += `<div class="group"><label class="label">${priceLabel} <span class="req">*</span></label>
+      <input class="input" value="${fmt(prod.price).replace(' ل.س', '')}"></div>`;
+            } else {
+                // Standard
+                h += `<div class="group"><label class="label">السعر (ل.س) <span class="req">*</span></label>
+      <input class="input" value="${fmt(prod.price).replace(' ل.س', '')}"></div>`;
+                if (prod.fields.compare) {
+                    h += `<div class="group"><label class="label">السعر قبل الخصم <span class="hint">(اختياري)</span></label>
+        <input class="input" value="${prod.compare ? fmt(prod.compare).replace(' ل.س', '') : ''}" placeholder="اختياري"></div>`;
+                }
+            }
+
+            // ── Stock logic ──
+            if (ltype === 'standard' && prod.fields.stock) {
+                h += `<div class="group"><label class="label">الكمية المتوفرة <span class="req">*</span></label>
+      <div class="input-unit-wrap"><span class="unit-tag">قطعة</span><input class="input" type="number" value="${prod.stock}"></div></div>`;
+            } else if (ltype === 'weighted') {
+                h += `<div class="group"><label class="label">المخزون <span class="hint">— يُدار حسب المتغيرات في الخطوة 3</span></label>
+      <input class="input off" value="يُدار حسب المتغيرات" disabled></div>`;
+            } else if (ltype === 'service') {
+                // No stock at all — show note
+            }
+            // Unique: don't show stock at all
+
+            // ── SKU ──
+            if (prod.fields.sku) {
+                h += `<div class="group"><label class="label">رمز المنتج SKU <span class="hint">(اختياري)</span></label>
+      <input class="input" value="${prod.sku || ''}" placeholder="مثال: SAM-S23-BLK"></div>`;
+            }
+
+            h += `</div>`; // close section
+
+            // Hidden fields note
+            if (ltype === 'unique') {
+                h += `<div class="note">ℹ️ الحقول المخفية: الكمية، رمز المنتج، والسعر قبل الخصم — لا تنطبق على الإعلانات الفريدة مثل العقارات والسيارات.</div>`;
+            } else if (ltype === 'weighted') {
+                h += `<div class="note">ℹ️ السعر والمخزون يُدار لكل متغير (وزن/حجم). ستحددهم في الخطوة الثالثة.</div>`;
+            } else if (ltype === 'service') {
+                h += `<div class="note">ℹ️ الخدمات ليس لها مخزون أو شحن. يمكن للمشتري الحجز أو التواصل مباشرة مع مقدم الخدمة.</div>`;
+            }
+
+            c.innerHTML = h;
+        }
+
+        // ── STEP 2 ──
+        function renderS2(c) {
+            let hint = '';
+            if (ltype === 'unique') hint = 'اذكر تفاصيل الموقع، المميزات، القرب من الخدمات، حالة العقار أو السيارة، وأي معلومات تهم المشتري.';
+            else if (ltype === 'weighted') hint = 'اذكر جودة المنتج، المصدر، طريقة التخزين، وأي شهادات جودة.';
+            else if (ltype === 'service') hint = 'اشرح تفاصيل الخدمة، ماذا تشمل، المدة المتوقعة، وشروط الضمان.';
+            else hint = 'اذكر مميزات المنتج، حالته، ماذا يشمل، وأي معلومات تفيد المشتري.';
+
+            c.innerHTML = `
+    <div class="section">
+      <div class="section-title">الوصف</div>
+      <div class="group">
+        <label class="label">وصف المنتج <span class="req">*</span></label>
+        <p style="font-size:11px;color:var(--text-muted);margin-bottom:6px;line-height:1.5;">${hint}</p>
+        <textarea class="textarea">${prod.desc}</textarea>
+      </div>
+    </div>`;
+        }
+
+        // ── STEP 3 ──
+        function renderS3(c) {
+            let h = '';
+
+            // Attributes
+            h += `<div class="section"><div class="section-title">خصائص التصنيف</div>`;
+            prod.attrs.forEach(a => {
+                if (a.t === 'select') {
+                    h += `<div class="group"><label class="label">${a.l} ${a.req ? '<span class="req">*</span>' : '<span class="hint">(اختياري)</span>'}</label>
+        <select class="select"><option value="">اختر ${a.l}...</option>
+          ${a.opts.map(o => `<option ${o === a.v || o === String(a.v) ? 'selected' : ''}>${o}</option>`).join('')}
+        </select></div>`;
+                } else if (a.t === 'number') {
+                    h += `<div class="group"><label class="label">${a.l} ${a.req ? '<span class="req">*</span>' : ''}</label>
+        <div class="input-unit-wrap">${a.unit ? `<span class="unit-tag">${a.unit}</span>` : ''}<input class="input" type="number" value="${a.v || ''}"></div></div>`;
+                } else {
+                    h += `<div class="group"><label class="label">${a.l} ${a.req ? '<span class="req">*</span>' : '<span class="hint">(اختياري)</span>'}</label>
+        <input class="input" value="${a.v || ''}"></div>`;
+                }
+            });
+            h += `</div>`;
+
+            // ── Variants ──
+            if (prod.fields.variants) {
+                const isReq = ltype === 'weighted';
+                h += `<div class="section"><div class="section-title">المتغيرات ${isReq ? '(مطلوب)' : '(اختياري)'}</div>`;
+
+                if (ltype === 'weighted') {
+                    h += `<div class="info weighted"><span class="info-i">⚖️</span><span>أضف أحجام مختلفة مع السعر والمخزون لكل حجم. المشتري سيختار المتغير عند الشراء.</span></div>`;
+                } else {
+                    h += `<div class="info standard"><span class="info-i">📦</span><span>اختياري: أضف متغيرات إذا كان المنتج متوفر بألوان أو أحجام أو إعدادات مختلفة.</span></div>`;
+                }
+
+                h += `<div class="var-box">`;
+
+                if (vars.length > 0) {
+                    vars.forEach((v, i) => {
+                        h += `<div class="var-row">
+          <div class="group"><label class="label">الوصف</label><input class="input" value="${v.label}" placeholder="مثال: 1 كيلو"></div>
+          <div class="group"><label class="label">السعر (ل.س)</label><input class="input" value="${v.price ? v.price.toLocaleString() : ''}"></div>
+          <div class="group"><label class="label">المخزون ${v.unit ? '(' + v.unit + ')' : ''}</label><input class="input" type="number" value="${v.stock || ''}"></div>
+          <button class="var-rm" onclick="rmVar(${i})">✕</button>
+        </div>`;
+                    });
+                }
+
+                h += `<button class="var-add" onclick="addVar()">+ إضافة متغير</button></div></div>`;
+            }
+
+            c.innerHTML = h;
+        }
+
+        function addVar() { vars.push({ label: '', price: null, stock: null, unit: prod.unitOptions ? prod.unitOptions[0] : '' }); render(); }
+        function rmVar(i) { vars.splice(i, 1); render(); }
+
+        // ── STEP 4 ──
+        function renderS4(c) {
+            let h = '';
+
+            // Basic
+            h += `<div class="rev-card"><div class="rev-head">المعلومات الأساسية <span class="rev-edit" onclick="goTo(0)">تعديل ←</span></div>`;
+            h += `<div class="rev-row"><span class="rl">التصنيف</span><span class="rv">${prod.cat.join(' ‹ ')}</span></div>`;
+            h += `<div class="rev-row"><span class="rl">نوع الإعلان</span><span class="rv"><span class="badge ${ltype}" style="font-size:9px;padding:2px 8px;">${TYPES[ltype].ar}</span></span></div>`;
+            h += `<div class="rev-row"><span class="rl">العنوان</span><span class="rv">${prod.name}</span></div>`;
+
+            // Price review
+            if (ltype === 'weighted' && vars.length) {
+                const min = Math.min(...vars.filter(v => v.price).map(v => v.price));
+                h += `<div class="rev-row"><span class="rl">السعر</span><span class="rv">يبدأ من ${fmt(min)}</span></div>`;
+            } else if (ltype === 'unique') {
+                h += `<div class="rev-row"><span class="rl">السعر</span><span class="rv">${fmt(prod.price)} ${neg ? '(قابل للتفاوض)' : ''}</span></div>`;
+            } else if (ltype === 'service') {
+                let pl = '';
+                if (prod.priceType === 'starting') pl = 'يبدأ من ';
+                else if (prod.priceType === 'per_session') pl = 'للجلسة: ';
+                else if (prod.priceType === 'per_hour') pl = 'بالساعة: ';
+                h += `<div class="rev-row"><span class="rl">السعر</span><span class="rv">${pl}${fmt(prod.price)}</span></div>`;
+            } else {
+                h += `<div class="rev-row"><span class="rl">السعر</span><span class="rv">${fmt(prod.price)}</span></div>`;
+                if (prod.compare) h += `<div class="rev-row"><span class="rl">قبل الخصم</span><span class="rv" style="text-decoration:line-through;color:var(--text-muted)">${fmt(prod.compare)}</span></div>`;
+                if (prod.stock !== undefined) h += `<div class="rev-row"><span class="rl">المخزون</span><span class="rv">${prod.stock} قطعة</span></div>`;
+                if (prod.sku) h += `<div class="rev-row"><span class="rl">SKU</span><span class="rv">${prod.sku}</span></div>`;
+            }
+            h += `</div>`;
+
+            // Description
+            h += `<div class="rev-card"><div class="rev-head">الوصف <span class="rev-edit" onclick="goTo(1)">تعديل ←</span></div>
+    <p style="font-size:12px;color:var(--text-sec);line-height:1.7;">${prod.desc}</p></div>`;
+
+            // Attributes
+            h += `<div class="rev-card"><div class="rev-head">الخصائص <span class="rev-edit" onclick="goTo(2)">تعديل ←</span></div>`;
+            prod.attrs.forEach(a => {
+                if (a.v !== undefined && a.v !== '') {
+                    h += `<div class="rev-row"><span class="rl">${a.l}</span><span class="rv">${a.v}${a.unit ? ' ' + a.unit : ''}</span></div>`;
+                }
+            });
+            h += `</div>`;
+
+            // Variants
+            if (vars.length > 0) {
+                h += `<div class="rev-card"><div class="rev-head">المتغيرات (${vars.length}) <span class="rev-edit" onclick="goTo(2)">تعديل ←</span></div>
+      <table class="rev-tbl"><thead><tr><th>المتغير</th><th>السعر</th><th>المخزون</th></tr></thead><tbody>`;
+                vars.forEach(v => {
+                    h += `<tr><td>${v.label}</td><td>${v.price ? fmt(v.price) : '—'}</td><td>${v.stock ?? '—'}${v.unit ? ' ' + v.unit : ''}</td></tr>`;
+                });
+                h += `</tbody></table></div>`;
+            }
+
+            // Edge case note in review
+            if (prod.edgeCaseNote) {
+                h += `<div class="edge-banner">⚠️ <span>${prod.edgeCaseNote}</span></div>`;
+            }
+
+            c.innerHTML = h;
+        }
+
+        // ═══════════════════════════════════════════════════════════
+        // BOOT
+        // ═══════════════════════════════════════════════════════════
+        buildSwitcher();
+        loadProduct('phone');
+    </script>
 </body>
+
 </html>
