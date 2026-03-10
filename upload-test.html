@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>دكان — اختبار رفع المنتج</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <style>
+        :root {
+            --bg: #0f0f13;
+            --surface: #18181f;
+            --border: #2a2a35;
+            --accent: #e8a020;
+            --accent-dim: rgba(232, 160, 32, 0.12);
+            --accent-glow: rgba(232, 160, 32, 0.35);
+            --text: #f0ede8;
+            --text-muted: #7a7887;
+            --success: #2ecc8a;
+            --error: #e85252;
+            --radius: 12px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'IBM Plex Sans Arabic', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 40px 20px;
+            direction: rtl;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(232, 160, 32, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(232, 160, 32, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            max-width: 720px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header {
+            margin-bottom: 36px;
+        }
+
+        .logo {
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .badge {
+            background: var(--accent-dim);
+            border: 1px solid rgba(232, 160, 32, 0.3);
+            color: var(--accent);
+            font-size: 11px;
+            font-weight: 600;
+            padding: 3px 10px;
+            border-radius: 20px;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 23px;
+            margin-top: 6px;
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 28px;
+            margin-bottom: 16px;
+        }
+
+        .card-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .field {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-muted);
+            margin-bottom: 7px;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        textarea,
+        select {
+            width: 100%;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-family: 'IBM Plex Sans Arabic', sans-serif;
+            font-size: 14px;
+            padding: 11px 14px;
+            direction: rtl;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-dim);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 90px;
+        }
+
+        .row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        /* Image upload */
+        #imageInput {
+            display: none;
+        }
+
+        .upload-zone {
+            border: 2px dashed var(--border);
+            border-radius: var(--radius);
+            padding: 32px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+        }
+
+        .upload-zone:hover,
+        .upload-zone.drag-over {
+            border-color: var(--accent);
+            background: var(--accent-dim);
+        }
+
+        .upload-icon {
+            font-size: 36px;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .upload-zone p {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .upload-zone strong {
+            color: var(--accent);
+        }
+
+        .upload-zone small {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 6px;
+            display: block;
+        }
+
+        .file-count {
+            font-size: 12px;
+            color: var(--accent);
+            margin-top: 12px;
+            font-weight: 500;
+        }
+
+        .preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .preview-item {
+            position: relative;
+            aspect-ratio: 1;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            background: var(--bg);
+        }
+
+        .preview-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .size-label {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.65);
+            font-size: 10px;
+            color: #fff;
+            text-align: center;
+            padding: 2px 0;
+        }
+
+        .remove-btn {
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            width: 22px;
+            height: 22px;
+            background: rgba(0, 0, 0, 0.75);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 11px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+        }
+
+        .remove-btn:hover {
+            background: var(--error);
+        }
+
+        /* Submit */
+        .submit-btn {
+            width: 100%;
+            background: var(--accent);
+            color: #0f0f13;
+            border: none;
+            border-radius: 10px;
+            font-family: 'IBM Plex Sans Arabic', sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            background: #f0ae28;
+            transform: translateY(-1px);
+            box-shadow: 0 8px 24px var(--accent-glow);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Progress */
+        .progress-wrap {
+            display: none;
+            margin-top: 20px;
+        }
+
+        .progress-wrap.visible {
+            display: block;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .progress-bar-bg {
+            height: 6px;
+            background: var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: var(--accent);
+            border-radius: 10px;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* Result */
+        .result-box {
+            display: none;
+            border-radius: var(--radius);
+            padding: 20px 24px;
+            margin-top: 16px;
+            border: 1px solid;
+        }
+
+        .result-box.visible {
+            display: block;
+        }
+
+        .result-box.success {
+            background: rgba(46, 204, 138, 0.08);
+            border-color: rgba(46, 204, 138, 0.3);
+        }
+
+        .result-box.error {
+            background: rgba(232, 82, 82, 0.08);
+            border-color: rgba(232, 82, 82, 0.3);
+        }
+
+        .result-title {
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 14px;
+        }
+
+        .result-box.success .result-title {
+            color: var(--success);
+        }
+
+        .result-box.error .result-title {
+            color: var(--error);
+        }
+
+        .result-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 12px;
+        }
+
+        .stat {
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 8px;
+            padding: 12px 14px;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        .stat-value {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .stat-unit {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .error-msg {
+            font-size: 13px;
+            color: var(--error);
+            line-height: 1.8;
+        }
+
+        .config-note {
+            background: rgba(232, 160, 32, 0.07);
+            border: 1px solid rgba(232, 160, 32, 0.2);
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-size: 12px;
+            color: var(--accent);
+            margin-bottom: 20px;
+            line-height: 1.7;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(0, 0, 0, 0.25);
+            border-top-color: #0f0f13;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            vertical-align: middle;
+            margin-right: 6px;
+        }
+
+        @media (max-width: 520px) {
+            .row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+
+        <div class="header">
+            <div class="logo">دُكان <span class="badge">اختبار السرعة</span></div>
+            <div class="subtitle">محاكاة رفع منتج جديد — قيس الوقت الفعلي للرفع </div>
+        </div>
+
+        <!-- Product details -->
+        <div class="card">
+            <div class="card-title">بيانات المنتج</div>
+            <div class="field">
+                <label>اسم المنتج</label>
+                <input type="text" id="f_name" value="سامسونج غالاكسي A54 — 128GB أسود" />
+            </div>
+            <div class="row">
+                <div class="field">
+                    <label>السعر (ل.س)</label>
+                    <input type="number" id="f_price" value="4500000" />
+                </div>
+                <div class="field">
+                    <label>الكمية</label>
+                    <input type="number" id="f_stock" value="12" />
+                </div>
+            </div>
+            <div class="row">
+                <div class="field">
+                    <label>التصنيف</label>
+                    <select id="f_category">
+                        <option>إلكترونيات › هواتف ذكية</option>
+                        <option>إلكترونيات › حواسيب</option>
+                        <option>ملابس › رجالي</option>
+                        <option>سيارات › قطع غيار</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label>الحالة</label>
+                    <select id="f_condition">
+                        <option>جديد</option>
+                        <option>مستعمل — ممتاز</option>
+                        <option>مستعمل — جيد</option>
+                    </select>
+                </div>
+            </div>
+            <div class="field">
+                <label>وصف المنتج</label>
+                <textarea
+                    id="f_description">هاتف سامسونج غالاكسي A54 بشاشة Super AMOLED بحجم 6.4 إنش، معالج Exynos 1380، ذاكرة 8GB، كاميرا 50MP، بطارية 5000mAh. اللون أسود، جديد مع كامل الملحقات والكفالة.</textarea>
+            </div>
+        </div>
+
+        <!-- Image upload -->
+        <div class="card">
+            <div class="card-title">صور المنتج</div>
+
+            <!-- Real input — hidden, triggered by JS -->
+            <input type="file" id="imageInput" accept="image/*" multiple />
+
+            <div class="upload-zone" id="uploadZone">
+                <span class="upload-icon">🖼️</span>
+                <p><strong>انقر هنا لاختيار الصور</strong></p>
+                <small>أو اسحب الصور وأفلتها — JPG، PNG، WebP</small>
+            </div>
+
+            <div id="previewGrid" class="preview-grid"></div>
+            <div id="fileCount" class="file-count"></div>
+        </div>
+
+        <!-- Submit -->
+        <div class="card">
+            <button class="submit-btn" id="submitBtn">
+                🚀 ابدأ الرفع وقِس الوقت
+            </button>
+            <div class="progress-wrap" id="progressWrap">
+                <div class="progress-label">
+                    <span id="progressText">جارٍ الرفع...</span>
+                    <span id="progressPct">0%</span>
+                </div>
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" id="progressFill"></div>
+                </div>
+            </div>
+            <div class="result-box" id="resultBox">
+                <div class="result-title" id="resultTitle"></div>
+                <div id="resultContent"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // ─────────────────────────────────────────────
+        // 🔧 CONFIG — أدخل بياناتك هنا
+        // ─────────────────────────────────────────────
+        const SUPABASE_URL = 'https://api.damasbazar.com';
+        const SUPABASE_ANON_KEY = 'sb_publishable_6K6w3TGOCPpBcK3OVQibtg_rlTrtU86';
+        const BUCKET = 'dummy_products';
+        const TABLE = 'dummy_products';
+
+        /*
+          SQL لإنشاء الجدول:
+        
+          create table dummy_products (
+            id           uuid primary key default gen_random_uuid(),
+            name         text,
+            price        numeric,
+            stock        integer,
+            category     text,
+            condition    text,
+            description  text,
+            images       text[],
+            uploaded_at  timestamptz default now()
+          );
+
+          alter table dummy_products
+  add column ip          text,
+  add column city        text,
+  add column country     text,
+  add column isp         text,
+  add column latitude    numeric,
+  add column longitude   numeric;
+        
+          -- اجعل RLS مفتوحاً للاختبار (أو أضف policy مناسبة):
+          alter table dummy_products enable row level security;
+          create policy "allow all for test" on dummy_products for all using (true) with check (true);
+        */
+        // ─────────────────────────────────────────────
+
+        const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        let selectedFiles = [];
+
+        let geoData = {};
+
+        (async () => {
+            try {
+                const res = await fetch('https://ipapi.co/json/');
+                const data = await res.json();
+                geoData = {
+                    ip: data.ip || null,
+                    city: data.city || null,
+                    country: data.country_name || null,
+                    isp: data.org || null,
+                    latitude: data.latitude || null,
+                    longitude: data.longitude || null,
+                };
+            } catch (e) {
+                console.warn('IP fetch failed:', e);
+            }
+        })();
+
+        // ── Wire file input to zone click ──
+        const imageInput = document.getElementById('imageInput');
+        const uploadZone = document.getElementById('uploadZone');
+
+        uploadZone.addEventListener('click', () => imageInput.click());
+
+        imageInput.addEventListener('change', () => {
+            if (imageInput.files.length) addFiles([...imageInput.files]);
+            imageInput.value = '';
+        });
+
+        // Drag & drop
+        uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('drag-over'); });
+        uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('drag-over'));
+        uploadZone.addEventListener('drop', e => {
+            e.preventDefault();
+            uploadZone.classList.remove('drag-over');
+            const imgs = [...e.dataTransfer.files].filter(f => f.type.startsWith('image/'));
+            if (imgs.length) addFiles(imgs);
+        });
+
+        function addFiles(files) {
+            files.forEach(f => {
+                if (!selectedFiles.some(x => x.name === f.name && x.size === f.size))
+                    selectedFiles.push(f);
+            });
+            renderPreviews();
+        }
+
+        function removeFile(idx) {
+            selectedFiles.splice(idx, 1);
+            renderPreviews();
+        }
+
+        function renderPreviews() {
+            const grid = document.getElementById('previewGrid');
+            const count = document.getElementById('fileCount');
+            grid.innerHTML = '';
+
+            selectedFiles.forEach((file, i) => {
+                const url = URL.createObjectURL(file);
+                const kb = file.size / 1024;
+                const size = kb < 1024 ? kb.toFixed(0) + ' KB' : (kb / 1024).toFixed(1) + ' MB';
+
+                const item = document.createElement('div');
+                item.className = 'preview-item';
+                item.innerHTML = `
+      <img src="${url}" alt="${file.name}" />
+      <div class="size-label">${size}</div>
+      <button class="remove-btn" data-idx="${i}" title="حذف">✕</button>
+    `;
+                item.querySelector('.remove-btn').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    removeFile(parseInt(e.currentTarget.dataset.idx));
+                });
+                grid.appendChild(item);
+            });
+
+            if (selectedFiles.length > 0) {
+                const total = selectedFiles.reduce((s, f) => s + f.size, 0);
+                const kb = total / 1024;
+                const str = kb < 1024 ? kb.toFixed(0) + ' KB' : (kb / 1024).toFixed(2) + ' MB';
+                count.textContent = `✅ ${selectedFiles.length} صورة — الحجم الكلي: ${str}`;
+            } else {
+                count.textContent = '';
+            }
+        }
+
+        // ── Upload ──
+        document.getElementById('submitBtn').addEventListener('click', startUpload);
+
+        async function add_to_dummy_measurements(productData, totalSec, sizeMB, speedMBs) {
+            const measurement = {
+                // then in measurement:
+                product_id: productData?.id || null,
+                total_time_sec: parseFloat(totalSec.toFixed(2)),
+                image_count: selectedFiles.length,
+                total_size_mb: parseFloat(sizeMB.toFixed(4)),
+                speed_mbs: parseFloat(speedMBs.toFixed(4)),
+                ip: geoData.ip || null,
+                city: geoData.city || null,
+                country: geoData.country || null,
+                isp: geoData.isp || null,
+                latitude: geoData.latitude || null,
+                longitude: geoData.longitude || null,
+                user_agent: navigator.userAgent,
+            };
+
+            const { error: measErr } = await client.from('dummy_measurements').insert(measurement);
+            if (measErr) errors.push(`قياسات: ${measErr.message}`);
+        }
+
+        async function startUpload() {
+            const btn = document.getElementById('submitBtn');
+            const progressWrap = document.getElementById('progressWrap');
+            const resultBox = document.getElementById('resultBox');
+
+            if (selectedFiles.length === 0) { alert('الرجاء اختيار صورة واحدة على الأقل'); return; }
+            if (SUPABASE_URL.includes('YOUR_PROJECT')) { alert('الرجاء إدخال بيانات Supabase في الكود أولاً'); return; }
+
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> جارٍ الرفع...';
+            resultBox.className = 'result-box';
+            resultBox.style.display = 'none';
+            progressWrap.className = 'progress-wrap visible';
+            setProgress(0, 'بدء الرفع...');
+
+            const errors = [];
+            const imageUrls = [];
+            const testId = `test-${Date.now()}`;
+            const totalBytes = selectedFiles.reduce((s, f) => s + f.size, 0);
+            const totalSteps = selectedFiles.length + 1; // images + DB insert
+            const startTime = performance.now();
+
+            // Step 1 — Upload images
+            for (let i = 0; i < selectedFiles.length; i++) {
+                const file = selectedFiles[i];
+                const path = `${testId}/${Date.now()}-${file.name}`;
+
+                setProgress(
+                    Math.round((i / totalSteps) * 100),
+                    `رفع الصورة ${i + 1} من ${selectedFiles.length}: ${file.name}`
+                );
+
+                const { error } = await client.storage.from(BUCKET).upload(path, file, { upsert: true });
+
+                if (error) {
+                    errors.push(`صورة "${file.name}": ${error.message}`);
+                } else {
+                    const { data: pub } = client.storage.from(BUCKET).getPublicUrl(path);
+                    imageUrls.push(pub.publicUrl);
+                }
+            }
+
+            // Step 2 — Insert product row into dummy_products
+            setProgress(Math.round((selectedFiles.length / totalSteps) * 100), 'حفظ بيانات المنتج...');
+
+            const row = {
+                name: document.getElementById('f_name').value.trim(),
+                price: parseFloat(document.getElementById('f_price').value) || 0,
+                stock: parseInt(document.getElementById('f_stock').value) || 0,
+                category: document.getElementById('f_category').value,
+                condition: document.getElementById('f_condition').value,
+                description: document.getElementById('f_description').value.trim(),
+                images: imageUrls,
+                uploaded_at: new Date().toISOString(),
+                ip: geoData.ip || null,
+                city: geoData.city || null,
+                country: geoData.country || null,
+                isp: geoData.isp || null,
+                latitude: geoData.latitude || null,
+                longitude: geoData.longitude || null,
+            };
+
+            const { data: productData, error: dbErr } = await client.from(TABLE).insert(row);
+            if (dbErr) errors.push(`قاعدة البيانات: ${dbErr.message}`);
+
+            setProgress(100, 'اكتمل');
+
+            const totalSec = (performance.now() - startTime) / 1000;
+            const sizeMB = totalBytes / (1024 * 1024);
+            const speedMBs = sizeMB / totalSec;
+
+            resultBox.style.display = 'block';
+
+            add_to_dummy_measurements(productData, totalSec, sizeMB, speedMBs)
+
+            if (errors.length === 0) {
+                resultBox.className = 'result-box visible success';
+                document.getElementById('resultTitle').textContent = '✅ تم الرفع بنجاح';
+                document.getElementById('resultContent').innerHTML = `
+      <div class="result-stats">
+        <div class="stat">
+          <div class="stat-label">الوقت الكلي</div>
+          <div class="stat-value">${totalSec.toFixed(2)}<span class="stat-unit"> ثانية</span></div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">عدد الصور</div>
+          <div class="stat-value">${selectedFiles.length}<span class="stat-unit"> صورة</span></div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">الحجم الكلي</div>
+          <div class="stat-value">${sizeMB.toFixed(2)}<span class="stat-unit"> MB</span></div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">متوسط السرعة</div>
+          <div class="stat-value">${speedMBs.toFixed(2)}<span class="stat-unit"> MB/s</span></div>
+        </div>
+      </div>`;
+            } else {
+                resultBox.className = 'result-box visible error';
+                document.getElementById('resultTitle').textContent = '❌ حدث خطأ';
+                document.getElementById('resultContent').innerHTML =
+                    `<div class="error-msg">${errors.join('<br/>')}</div>`;
+            }
+
+            btn.disabled = false;
+            btn.innerHTML = '🔁 إعادة الاختبار';
+        }
+
+        function setProgress(pct, label) {
+            document.getElementById('progressFill').style.width = pct + '%';
+            document.getElementById('progressPct').textContent = pct + '%';
+            document.getElementById('progressText').textContent = label;
+        }
+    </script>
+</body>
+
+</html>
