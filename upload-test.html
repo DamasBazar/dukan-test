@@ -619,13 +619,35 @@
             if (imgs.length) addFiles(imgs);
         });
 
-        function addFiles(files) {
-            files.forEach(f => {
-                if (!selectedFiles.some(x => x.name === f.name && x.size === f.size))
-                    selectedFiles.push(f);
-            });
+        async function addFiles(files) {
+            for (const f of files) {
+                if (selectedFiles.some(x => x.name === f.name && x.size === f.size)) continue;
+                const webp = await convertToWebP(f);
+                selectedFiles.push(webp);
+            }
             renderPreviews();
         }
+
+        function convertToWebP(file) {
+            return new Promise((resolve) => {
+                const img = new Image();
+                const url = URL.createObjectURL(file);
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    canvas.getContext('2d').drawImage(img, 0, 0);
+                    canvas.toBlob((blob) => {
+                        // rename to .webp
+                        const converted = new File([blob], file.name.replace(/\.[^.]+$/, '.webp'), { type: 'image/webp' });
+                        URL.revokeObjectURL(url);
+                        resolve(converted);
+                    }, 'image/webp', 0.7);
+                };
+                img.src = url;
+            });
+        }
+
 
         function removeFile(idx) {
             selectedFiles.splice(idx, 1);
