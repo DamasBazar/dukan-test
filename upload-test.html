@@ -438,6 +438,22 @@
             <div class="subtitle">محاكاة رفع منتج جديد — قيس الوقت الفعلي للرفع </div>
         </div>
 
+        <div class="card">
+            <div class="card-title">معلومات إضافية</div>
+            <div class="field">
+                <label>
+                    اسمك
+                    <span
+                        style="color: lightcoral; font-weight: 400; font-size: 11px; margin-right: 6px;">(اختياري)</span>
+                </label>
+                <input type="text" id="f_username" placeholder="مثال: أحمد من حلب" />
+                <div style="font-size: 11px; color: var(--muted); margin-top: 6px;">
+                    💡 لن يُنشر اسمك — يساعدنا فقط في التواصل معك
+                </div>
+            </div>
+        </div>
+
+
         <!-- Product details -->
         <div class="card">
             <div class="card-title">بيانات المنتج</div>
@@ -655,6 +671,7 @@
 
         async function add_to_dummy_measurements(productData, totalSec, sizeMB, speedMBs) {
             const measurement = {
+                username: document.getElementById('f_username').value.trim() || 'NO_NAME',
                 // then in measurement:
                 product_id: productData?.id || null,
                 total_time_sec: parseFloat(totalSec.toFixed(2)),
